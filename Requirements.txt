@@ -1,10 +1,10 @@
-Library	Purpose
+Library	            Purpose
 pandas	            Data manipulation and transformation
-sqlalchemy	    Database ORM and connection management
+sqlalchemy	        Database ORM and connection management
 psycopg2-binary	    PostgreSQL driver
 gspread	            Accessing Google Sheets
-google-auth	    Authentication for Google APIs
-python-dotenv	    Loading environment variables
+google-auth	        Authentication for Google APIs
+python-dotenv	      Loading environment variables
 openpyxl, xlrd	    Excel file reading/writing
 logging	            Logging ETL steps and errors
 
