@@ -34,7 +34,7 @@ The data is extracted, cleaned, and standardized before being loaded into a Post
 
 <h2>Python Libaries Used</h2>
 
-- <b>see requirements.text</b>
+- <b>[see requirements.text](https://github.com/SimonMuriu-pro/Etl-Automation-Project-1/blob/main/Requirements.txt)</b>
 
 <h2> Recommended Tools</h2>
 
