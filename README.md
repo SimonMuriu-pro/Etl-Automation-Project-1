@@ -38,7 +38,7 @@ This project automates an ETL (Extract, Transform, Load) pipeline that consolida
 
 <h2>📚 Python Libaries Used</h2>
 
-- <b>[see requirements.text](https://github.com/SimonMuriu-pro/Etl-Automation-Project-1/blob/main/Requirements.txt)</b>
+- <b>see [requirements.text](https://github.com/SimonMuriu-pro/Etl-Automation-Project-1/blob/main/Requirements.txt)</b>
 
 <h2>🛠️ Recommended Tools</h2>
 
