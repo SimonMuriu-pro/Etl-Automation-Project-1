@@ -1,26 +1,95 @@
 import smtplib
+import logging
 from email.message import EmailMessage
+from email.utils import formatdate
 import os
 from dotenv import load_dotenv
+import ssl
 
-load_dotenv()  # Loads environment variables from a .env file
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler()]
+)
+logger = logging.getLogger(__name__)
 
-# Email credentials from environment
-EMAIL_SENDER = os.getenv("EMAIL_SENDER")
-EMAIL_RECEIVER = os.getenv("EMAIL_RECEIVER")
-EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
+# Load environment variables
+load_dotenv()
 
-def send_success_email():
+def send_etl_notification(status: str, error_message: str = None) -> None:
+    """
+    Sends an ETL process notification email
+    
+    :param status: 'success' or 'failure'
+    :param error_message: Detailed error message (required for failures)
+    """
+    # Validate inputs
+    if status not in ['success', 'failure']:
+        raise ValueError("Status must be 'success' or 'failure'")
+    
+    if status == 'failure' and not error_message:
+        raise ValueError("Error message is required for failure notifications")
+
+    # Configure email parameters
+    subject = f"ETL Process {'✅ Completed Successfully' if status == 'success' else '❌ Failed'}"
+    sender = os.getenv("EMAIL_SENDER")
+    receiver = os.getenv("EMAIL_RECEIVER")
+    password = os.getenv("EMAIL_PASSWORD")
+    
+    # Create email content
     msg = EmailMessage()
-    msg['Subject'] = '✅ ETL Process Completed Successfully'
-    msg['From'] = EMAIL_SENDER
-    msg['To'] = EMAIL_RECEIVER
-    msg.set_content('The ETL process completed successfully and the cleaned data has been loaded into PostgreSQL.')
+    msg['Subject'] = subject
+    msg['From'] = sender
+    msg['To'] = receiver
+    msg['Date'] = formatdate(localtime=True)
+    
+    if status == 'success':
+        content = """
+        The ETL process completed successfully.
+        
+        Details:
+        - Cleaned data loaded into PostgreSQL
+        - All transformations executed as expected
+        """
+    else:
+        content = f"""
+        The ETL process encountered an error!
+        
+        Error Details:
+        {error_message}
+        
+        Action Required:
+        - Check system logs
+        - Verify data sources
+        - Review processing pipeline
+        """
+    
+    msg.set_content(content.strip())
 
+    # Send email with secure connection
     try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-            smtp.login(EMAIL_SENDER, EMAIL_PASSWORD)
-            smtp.send_message(msg)
-        print("✅ Success email sent.")
+        context = ssl.create_default_context()
+        
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as server:
+            server.login(sender, password)
+            server.send_message(msg)
+            logger.info(f"ETL {status} notification sent to {receiver}")
+            
+    except smtplib.SMTPAuthenticationError:
+        logger.error("Authentication failed - check email credentials")
+    except smtplib.SMTPException as e:
+        logger.error(f"SMTP protocol error: {str(e)}")
     except Exception as e:
-        print(f"Failed to send success email: {e}")
+        logger.exception(f"Unexpected error sending email: {str(e)}")
+
+# Example usage
+if __name__ == "__main__":
+    # For successful execution
+    send_etl_notification(status='success')
+    
+    # For failed execution
+    # send_etl_notification(
+    #     status='failure',
+    #     error_message="Connection timeout at extraction stage (Source: API endpoint)"
+    # )
