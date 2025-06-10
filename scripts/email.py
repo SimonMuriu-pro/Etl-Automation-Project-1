@@ -83,13 +83,4 @@ def send_etl_notification(status: str, error_message: str = None) -> None:
     except Exception as e:
         logger.exception(f"Unexpected error sending email: {str(e)}")
 
-# Example usage
-if __name__ == "__main__":
-    # For successful execution
-    send_etl_notification(status='success')
-    
-    # For failed execution
-    # send_etl_notification(
-    #     status='failure',
-    #     error_message="Connection timeout at extraction stage (Source: API endpoint)"
-    # )
+
